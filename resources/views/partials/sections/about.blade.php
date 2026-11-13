@@ -31,7 +31,7 @@
                     <article class="about-interests">
                         <h3>Keterampilan &amp; Minat</h3>
                         <ul class="about-interest-list" role="tablist" aria-label="Pilih bidang informatika yang diminati">
-                            @foreach ($aboutSkills as $skill)
+                            @foreach ($skillDomains as $skill)
                                 <li role="presentation">
                                     <button
                                         id="skill-tab-{{ $skill['slug'] }}"
@@ -75,7 +75,7 @@
                 </div>
 
                 <div class="about-skill-panels">
-                    @foreach ($aboutSkills as $skill)
+                    @foreach ($skillDomains as $skill)
                         <article
                             id="skill-panel-{{ $skill['slug'] }}"
                             role="tabpanel"

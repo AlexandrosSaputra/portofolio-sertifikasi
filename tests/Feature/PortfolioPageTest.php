@@ -32,7 +32,9 @@ class PortfolioPageTest extends TestCase
     {
         $response = $this->get('/');
 
-        $response->assertSee('Absensi Pegawai')
+        $response->assertSee('Pandansari System')
+            ->assertSee('NH-ZIS')
+            ->assertSee('Absensi Pegawai')
             ->assertSee('SIM Pegawai')
             ->assertSee('Penggajian Pegawai')
             ->assertSee('Pengadaan Barang')
@@ -51,14 +53,35 @@ class PortfolioPageTest extends TestCase
             ->assertSee('skill-panel-ui-ux', false);
     }
 
-    public function test_portfolio_page_renders_skills_console(): void
+    public function test_portfolio_page_renders_skill_domains_with_details(): void
     {
         $response = $this->get('/');
 
-        $response->assertSee('CAPABILITIES.LOG')
-            ->assertSee('Frontend')
-            ->assertSee('Backend')
-            ->assertSee('Programming')
-            ->assertSee('Design');
+        $response->assertOk()
+            ->assertSee('CAPABILITIES.LOG')
+            ->assertSee('Fokus utama')
+            ->assertSee('Web Developer')
+            ->assertSee('Android Developer')
+            ->assertSee('Data Analyst')
+            ->assertSee('Machine Learning')
+            ->assertSee('Kriptografi')
+            ->assertSee('Flutter')
+            ->assertSee('Supabase')
+            ->assertSee('Ollama')
+            ->assertSee('MLPClassifier')
+            ->assertSee('Prediction Error');
+    }
+
+    public function test_skill_section_reuses_the_same_domains_as_the_about_section(): void
+    {
+        $response = $this->get('/');
+        $domains = ['web-developer', 'android-developer', 'data-analyst', 'machine-learning', 'kriptografi', 'ui-ux'];
+
+        foreach ($domains as $domain) {
+            $response->assertSee('skill-tab-'.$domain, false)
+                ->assertSee('data-skill-domain="'.$domain.'"', false);
+        }
+
+        $this->assertSame(count($domains), substr_count((string) $response->getContent(), 'data-skill-domain="'));
     }
 }
