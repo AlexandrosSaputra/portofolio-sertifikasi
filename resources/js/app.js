@@ -79,6 +79,151 @@ if (profileFrame && profileCard && allowsMotion) {
     });
 }
 
+const skillShowcase = document.querySelector('[data-skill-showcase]');
+const skillTabs = [...document.querySelectorAll('[data-skill-tab]')];
+const skillPanels = [...document.querySelectorAll('[data-skill-panel]')];
+const skillCount = skillShowcase?.querySelector('[data-skill-count]');
+const skillStatus = skillShowcase?.querySelector('[data-skill-status]');
+const skillProgress = skillShowcase?.querySelector('[data-skill-progress]');
+const previousSkillButton = skillShowcase?.querySelector('[data-skill-previous]');
+const nextSkillButton = skillShowcase?.querySelector('[data-skill-next]');
+const skillRotationInterval = 5000;
+
+if (skillShowcase && skillTabs.length === skillPanels.length && skillTabs.length > 0) {
+    let activeSkillIndex = 0;
+    let isSkillPinned = false;
+    let skillRotationTimer = null;
+
+    const renderSkill = (index) => {
+        activeSkillIndex = index;
+
+        skillTabs.forEach((tab, tabIndex) => {
+            const isActive = tabIndex === activeSkillIndex;
+            tab.classList.toggle('is-active', isActive);
+            tab.setAttribute('aria-selected', String(isActive));
+            tab.setAttribute('tabindex', isActive ? '0' : '-1');
+        });
+
+        skillPanels.forEach((panel, panelIndex) => {
+            panel.toggleAttribute('hidden', panelIndex !== activeSkillIndex);
+        });
+
+        if (skillCount) {
+            const current = String(activeSkillIndex + 1).padStart(2, '0');
+            const total = String(skillTabs.length).padStart(2, '0');
+            skillCount.textContent = `${current} / ${total}`;
+        }
+    };
+
+    const stopSkillRotation = () => {
+        window.clearTimeout(skillRotationTimer);
+        skillRotationTimer = null;
+        skillProgress?.classList.remove('is-running');
+    };
+
+    const updateSkillStatus = () => {
+        skillShowcase.toggleAttribute('data-pinned', isSkillPinned);
+
+        if (!skillStatus) {
+            return;
+        }
+
+        if (!allowsMotion) {
+            skillStatus.textContent = 'Rotasi otomatis dinonaktifkan';
+            return;
+        }
+
+        skillStatus.textContent = isSkillPinned
+            ? 'Terkunci · klik ulang untuk melepas'
+            : 'Rotasi otomatis · 5 detik';
+    };
+
+    const restartSkillProgress = () => {
+        if (!skillProgress || !allowsMotion || isSkillPinned) {
+            return;
+        }
+
+        skillProgress.classList.remove('is-running');
+        void skillProgress.offsetWidth;
+        skillProgress.classList.add('is-running');
+    };
+
+    const scheduleSkillRotation = () => {
+        stopSkillRotation();
+
+        if (!allowsMotion || isSkillPinned || document.hidden) {
+            return;
+        }
+
+        restartSkillProgress();
+        skillRotationTimer = window.setTimeout(() => {
+            renderSkill((activeSkillIndex + 1) % skillTabs.length);
+            scheduleSkillRotation();
+        }, skillRotationInterval);
+    };
+
+    const pinSkill = (index) => {
+        renderSkill(index);
+        isSkillPinned = true;
+        updateSkillStatus();
+        stopSkillRotation();
+    };
+
+    skillTabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => {
+            if (index === activeSkillIndex && isSkillPinned) {
+                isSkillPinned = false;
+                updateSkillStatus();
+                scheduleSkillRotation();
+                return;
+            }
+
+            pinSkill(index);
+        });
+
+        tab.addEventListener('keydown', (event) => {
+            const keyTargets = {
+                ArrowRight: (index + 1) % skillTabs.length,
+                ArrowDown: (index + 1) % skillTabs.length,
+                ArrowLeft: (index - 1 + skillTabs.length) % skillTabs.length,
+                ArrowUp: (index - 1 + skillTabs.length) % skillTabs.length,
+                Home: 0,
+                End: skillTabs.length - 1,
+            };
+            const targetIndex = keyTargets[event.key];
+
+            if (targetIndex === undefined) {
+                return;
+            }
+
+            event.preventDefault();
+            skillTabs[targetIndex].focus();
+            pinSkill(targetIndex);
+        });
+    });
+
+    previousSkillButton?.addEventListener('click', () => {
+        pinSkill((activeSkillIndex - 1 + skillTabs.length) % skillTabs.length);
+    });
+
+    nextSkillButton?.addEventListener('click', () => {
+        pinSkill((activeSkillIndex + 1) % skillTabs.length);
+    });
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            stopSkillRotation();
+            return;
+        }
+
+        scheduleSkillRotation();
+    });
+
+    renderSkill(activeSkillIndex);
+    updateSkillStatus();
+    scheduleSkillRotation();
+}
+
 const sections = [...document.querySelectorAll('main section[id]')];
 const navLinks = [...document.querySelectorAll('[data-nav-link]')];
 const sectionObserver = new IntersectionObserver((entries) => {

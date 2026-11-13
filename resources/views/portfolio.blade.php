@@ -114,22 +114,103 @@
                     <span class="section-number">01 / 04</span>
                 </div>
 
-                <div class="about-layout">
-                    <div class="about-visual" data-reveal>
-                        <img src="{{ asset('images/about-photo.jpg') }}" alt="Foto Alexandros Saputra" loading="lazy">
-                        <div class="about-visual-label"><span>Based in</span><strong>Surabaya<br>Indonesia</strong></div>
+                @php
+                    $aboutSkills = [
+                        ['web-developer', 'Web Developer', 'Saya membangun aplikasi absensi, sistem informasi pegawai, dan penggajian menggunakan Laravel, CodeIgniter, PHP, serta MySQL. Saya menyukai proses menyusun alur data dan antarmuka menjadi sistem yang mudah digunakan.'],
+                        ['android-developer', 'Android Developer', 'Saya tertarik membawa pengalaman membangun sistem informasi ke perangkat mobile. Bidang ini saya pelajari untuk memahami aplikasi yang dekat dengan aktivitas pengguna dan tetap nyaman digunakan di berbagai ukuran layar.'],
+                        ['data-analyst', 'Data Analyst', 'Proyek absensi, penggajian, dan pengelolaan pegawai membuat saya terbiasa melihat data sebagai dasar pengambilan keputusan. Saya menikmati proses merapikan data dan mengubahnya menjadi informasi yang lebih mudah dipahami.'],
+                        ['machine-learning', 'Machine Learning', 'Melalui Python dan eksplorasi kecerdasan buatan, saya mempelajari bagaimana pola dalam data dapat digunakan untuk membantu menyelesaikan masalah. Fokus saya masih pada pemahaman dasar dan penerapannya secara bertahap.'],
+                        ['kriptografi', 'Kriptografi', 'Saya tertarik pada cara sebuah sistem menjaga kerahasiaan, integritas, dan keaslian informasi. Kriptografi membantu saya melihat bahwa keamanan harus dipikirkan sejak data dibuat, disimpan, hingga dikirim.'],
+                        ['ui-ux', 'UI/UX', 'Saat mengerjakan antarmuka pengadaan barang dan portofolio ini, saya belajar menyederhanakan informasi, membangun hierarki visual, dan memperbaiki detail berdasarkan hasil yang benar-benar terlihat di layar.'],
+                    ];
+                @endphp
+
+                <div class="about-layout" data-skill-showcase>
+                    <div class="about-copy" data-reveal>
+                        <div class="about-intro">
+                            <p class="about-label">Latar Belakang</p>
+                            <p class="lead">Saya menikmati proses mengubah ide menjadi produk digital yang terasa sederhana di permukaan, tetapi kuat di balik layar.</p>
+                            <p>Fokus saya berada di persimpangan web development, kecerdasan buatan, dan UI/UX. Saya percaya kualitas lahir dari detail: struktur kode yang bersih, interaksi yang responsif, dan keputusan desain yang memiliki alasan.</p>
+                        </div>
+
+                        <div class="about-information">
+                            <article class="about-education">
+                                <h3>Pendidikan</h3>
+                                <div class="education-list">
+                                    <div>
+                                        <strong>Universitas 17 Agustus 1945 Surabaya</strong>
+                                        <span>Teknik Informatika</span>
+                                    </div>
+                                    <div>
+                                        <strong>SMA Muhammadiyah 2 Yogyakarta</strong>
+                                        <span>Sekolah Menengah Atas</span>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article class="about-interests">
+                                <h3>Keterampilan &amp; Minat</h3>
+                                <ul class="about-interest-list" role="tablist" aria-label="Pilih bidang informatika yang diminati">
+                                    @foreach ($aboutSkills as [$slug, $title])
+                                        <li role="presentation">
+                                            <button
+                                                id="skill-tab-{{ $slug }}"
+                                                type="button"
+                                                role="tab"
+                                                class="{{ $loop->first ? 'is-active' : '' }}"
+                                                aria-selected="{{ $loop->first ? 'true' : 'false' }}"
+                                                aria-controls="skill-panel-{{ $slug }}"
+                                                tabindex="{{ $loop->first ? '0' : '-1' }}"
+                                                data-skill-tab
+                                            >
+                                                {{ $title }}
+                                            </button>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </article>
+                        </div>
+
                     </div>
 
-                    <div class="about-copy" data-reveal>
-                        <p class="lead">Saya menikmati proses mengubah ide menjadi produk digital yang terasa sederhana di permukaan, tetapi kuat di balik layar.</p>
-                        <p>Fokus saya berada di persimpangan web development, kecerdasan buatan, dan UI/UX. Saya percaya kualitas lahir dari detail: struktur kode yang bersih, interaksi yang responsif, dan keputusan desain yang memiliki alasan.</p>
-
-                        <div class="about-facts">
-                            <article><span>01</span><h3>Web Development</h3><p>Antarmuka responsif dan backend Laravel yang terstruktur.</p></article>
-                            <article><span>02</span><h3>Artificial Intelligence</h3><p>Eksplorasi solusi berbasis data untuk persoalan nyata.</p></article>
-                            <article><span>03</span><h3>UI/UX Design</h3><p>Pengalaman yang jelas, konsisten, dan mudah dinavigasi.</p></article>
-                            <article><span>04</span><h3>Continuous Learning</h3><p>Terus bereksperimen, mengukur, dan memperbaiki hasil.</p></article>
+                    <figure class="about-visual" data-reveal>
+                        <div class="about-portrait">
+                            <img src="{{ asset('images/about-photo.jpg') }}" alt="Foto Alexandros Saputra" loading="lazy">
                         </div>
+                    </figure>
+
+                    <div class="about-skill-card" data-reveal>
+                        <div class="about-skill-card-meta">
+                            <span data-skill-count>01 / 06</span>
+                            <div class="about-skill-card-actions">
+                                <span data-skill-status role="status">Rotasi otomatis · 5 detik</span>
+                                <div class="about-skill-navigation" role="group" aria-label="Navigasi deskripsi minat">
+                                    <button type="button" data-skill-previous aria-label="Tampilkan minat sebelumnya">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg>
+                                    </button>
+                                    <button type="button" data-skill-next aria-label="Tampilkan minat berikutnya">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="about-skill-panels">
+                            @foreach ($aboutSkills as [$slug, $title, $description])
+                                <article
+                                    id="skill-panel-{{ $slug }}"
+                                    role="tabpanel"
+                                    aria-labelledby="skill-tab-{{ $slug }}"
+                                    data-skill-panel
+                                    @if (! $loop->first) hidden @endif
+                                >
+                                    <h4>{{ $title }}</h4>
+                                    <p>{{ $description }}</p>
+                                </article>
+                            @endforeach
+                        </div>
+
+                        <div class="about-skill-progress" aria-hidden="true"><span data-skill-progress></span></div>
                     </div>
                 </div>
             </div>
