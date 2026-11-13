@@ -47,6 +47,22 @@ class PortfolioPageTest extends TestCase
         $this->assertSame(6, substr_count((string) $response->getContent(), 'data-project-card'));
     }
 
+    public function test_portfolio_page_renders_contact_channels(): void
+    {
+        $response = $this->get('/');
+
+        $response->assertOk()
+            ->assertSee('https://www.linkedin.com/in/alexandrossaputra/', false)
+            ->assertSee('https://www.instagram.com/alexandrossaputra/', false)
+            ->assertSee('mailto:alexandrossaputra@gmail.com', false)
+            ->assertSee('https://github.com/alexandrossaputra', false)
+            ->assertSee('@alexandrossaputra')
+            ->assertSee('alexandrossaputra@gmail.com')
+            ->assertSee('Surabaya, Indonesia')
+            ->assertSee('contact-flight-route', false)
+            ->assertSee('contact-flight-plane', false);
+    }
+
     public function test_portfolio_page_renders_about_skill_tabs(): void
     {
         $response = $this->get('/');

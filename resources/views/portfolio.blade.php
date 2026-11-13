@@ -24,7 +24,5 @@
         @include('partials.sections.projects')
         @include('partials.sections.contact')
     </main>
-
-    @include('partials.footer')
 </body>
 </html>
