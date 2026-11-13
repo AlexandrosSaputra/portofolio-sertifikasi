@@ -142,17 +142,17 @@ class PortfolioController extends Controller
     }
 
     /**
-     * @return list<array{title: string, category: string, category_label: string, image: string, description: string, stack: list<string>}>
+     * @return list<array{title: string, category_label: string, image: string, description: string, stack: list<string>}>
      */
     private function projects(): array
     {
         return [
-            ['title' => 'Pandansari System', 'category' => 'web', 'category_label' => 'Web App', 'image' => 'images/project-pandansari.png', 'description' => 'Sistem operasional multi-outlet dengan POS, inventori, transfer stok antar unit, dan prediksi permintaan untuk rekomendasi restock.', 'stack' => ['Laravel', 'React', 'TypeScript', 'MySQL', 'Ollama']],
-            ['title' => 'NH-ZIS', 'category' => 'web', 'category_label' => 'Web App', 'image' => 'images/project-nhzis.png', 'description' => 'Aplikasi penghimpunan ZIS untuk pengelolaan donatur, KPI fundraiser, validasi setoran, dan rekonsiliasi rekening koran.', 'stack' => ['Laravel', 'Inertia', 'React', 'TypeScript', 'Tailwind CSS']],
-            ['title' => 'Absensi Pegawai', 'category' => 'web', 'category_label' => 'Web App', 'image' => 'images/project-absensi.png', 'description' => 'Aplikasi absensi berbasis CodeIgniter 4 dengan rekap kehadiran dan laporan real-time.', 'stack' => ['CodeIgniter', 'MySQL', 'Bootstrap']],
-            ['title' => 'SIM Pegawai', 'category' => 'frontend', 'category_label' => 'Frontend', 'image' => 'images/project-simpeg.png', 'description' => 'Sistem informasi pegawai dengan pengelolaan data, CRUD, dan akses multi-role.', 'stack' => ['Laravel', 'Tailwind CSS', 'MySQL']],
-            ['title' => 'Penggajian Pegawai', 'category' => 'web', 'category_label' => 'Web App', 'image' => 'images/project-penggajian.png', 'description' => 'Aplikasi penggajian otomatis dengan perhitungan tunjangan dan laporan yang terstruktur.', 'stack' => ['Laravel', 'PHP', 'MySQL']],
-            ['title' => 'Pengadaan Barang', 'category' => 'design', 'category_label' => 'UI/UX', 'image' => 'images/project-pengadaan.png', 'description' => 'Antarmuka pengadaan barang yang ringkas, terhubung dengan basis data Google Spreadsheet.', 'stack' => ['HTML', 'CSS', 'JavaScript']],
+            ['title' => 'Pandansari System', 'category_label' => 'Web App', 'image' => 'images/project-pandansari.png', 'description' => 'Sistem operasional multi-outlet dengan POS, inventori, transfer stok antar unit, dan prediksi permintaan untuk rekomendasi restock.', 'stack' => ['Laravel', 'React', 'TypeScript', 'MySQL', 'Ollama']],
+            ['title' => 'NH-ZIS', 'category_label' => 'Web App', 'image' => 'images/project-nhzis.png', 'description' => 'Aplikasi penghimpunan ZIS untuk pengelolaan donatur, KPI fundraiser, validasi setoran, dan rekonsiliasi rekening koran.', 'stack' => ['Laravel', 'Inertia', 'React', 'TypeScript', 'Tailwind CSS']],
+            ['title' => 'Absensi Pegawai', 'category_label' => 'Web App', 'image' => 'images/project-absensi.png', 'description' => 'Aplikasi absensi berbasis CodeIgniter 4 dengan rekap kehadiran dan laporan real-time.', 'stack' => ['CodeIgniter', 'MySQL', 'Bootstrap']],
+            ['title' => 'SIM Pegawai', 'category_label' => 'Frontend', 'image' => 'images/project-simpeg.png', 'description' => 'Sistem informasi pegawai dengan pengelolaan data, CRUD, dan akses multi-role.', 'stack' => ['Laravel', 'Tailwind CSS', 'MySQL']],
+            ['title' => 'Penggajian Pegawai', 'category_label' => 'Web App', 'image' => 'images/project-penggajian.png', 'description' => 'Aplikasi penggajian otomatis dengan perhitungan tunjangan dan laporan yang terstruktur.', 'stack' => ['Laravel', 'PHP', 'MySQL']],
+            ['title' => 'Pengadaan Barang', 'category_label' => 'UI/UX', 'image' => 'images/project-pengadaan.png', 'description' => 'Antarmuka pengadaan barang yang ringkas, terhubung dengan basis data Google Spreadsheet.', 'stack' => ['HTML', 'CSS', 'JavaScript']],
         ];
     }
 }

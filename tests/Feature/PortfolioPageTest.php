@@ -28,19 +28,23 @@ class PortfolioPageTest extends TestCase
         }
     }
 
-    public function test_portfolio_page_renders_projects_and_filters(): void
+    public function test_portfolio_page_renders_project_showcase(): void
     {
         $response = $this->get('/');
 
-        $response->assertSee('Pandansari System')
+        $response->assertOk()
+            ->assertSee('Pandansari System')
             ->assertSee('NH-ZIS')
             ->assertSee('Absensi Pegawai')
             ->assertSee('SIM Pegawai')
             ->assertSee('Penggajian Pegawai')
             ->assertSee('Pengadaan Barang')
-            ->assertSee('data-filter="web"', false)
-            ->assertSee('data-filter="frontend"', false)
-            ->assertSee('data-filter="design"', false);
+            ->assertSee('data-project-showcase', false)
+            ->assertSee('data-project-title', false)
+            ->assertSee('data-project-previous', false)
+            ->assertSee('data-project-next', false);
+
+        $this->assertSame(6, substr_count((string) $response->getContent(), 'data-project-card'));
     }
 
     public function test_portfolio_page_renders_about_skill_tabs(): void

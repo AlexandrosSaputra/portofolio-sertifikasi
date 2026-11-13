@@ -15,24 +15,131 @@ document.querySelectorAll('[data-nav-link]').forEach((link) => {
     });
 });
 
-const filters = document.querySelectorAll('[data-filter]');
-const projectCards = document.querySelectorAll('[data-project]');
+const projectShowcase = document.querySelector('[data-project-showcase]');
 
-filters.forEach((button) => {
-    button.addEventListener('click', () => {
-        const filter = button.dataset.filter;
-        filters.forEach((item) => {
-            item.classList.remove('is-active');
-            item.setAttribute('aria-pressed', 'false');
+if (projectShowcase) {
+    const projectCards = [...projectShowcase.querySelectorAll('[data-project-card]')];
+    const projectCategory = projectShowcase.querySelector('[data-project-category]');
+    const projectTitle = projectShowcase.querySelector('[data-project-title]');
+    const projectDescription = projectShowcase.querySelector('[data-project-description]');
+    const projectStack = projectShowcase.querySelector('[data-project-stack]');
+    const projectCounter = projectShowcase.querySelector('[data-project-counter]');
+    const projectStatus = projectShowcase.querySelector('[data-project-status]');
+    const previousProjectButton = projectShowcase.querySelector('[data-project-previous]');
+    const nextProjectButton = projectShowcase.querySelector('[data-project-next]');
+    const totalProjects = projectCards.length;
+    let activeProjectIndex = 0;
+
+    const padProjectNumber = (value) => String(value).padStart(2, '0');
+
+    const getProjectPosition = (cardIndex) => {
+        let position = cardIndex - activeProjectIndex;
+
+        if (position > totalProjects / 2) {
+            position -= totalProjects;
+        }
+
+        if (position < -totalProjects / 2) {
+            position += totalProjects;
+        }
+
+        return position;
+    };
+
+    const renderProject = (index, announce = true) => {
+        if (totalProjects === 0) {
+            return;
+        }
+
+        activeProjectIndex = (index + totalProjects) % totalProjects;
+
+        projectCards.forEach((card, cardIndex) => {
+            const position = getProjectPosition(cardIndex);
+            const isOffstage = Math.abs(position) > 2;
+            const isActive = position === 0;
+
+            card.dataset.position = String(position);
+            card.style.setProperty('--position', String(position));
+            card.classList.toggle('is-offstage', isOffstage);
+            card.toggleAttribute('inert', isOffstage);
+
+            if (isOffstage) {
+                card.setAttribute('aria-hidden', 'true');
+            } else {
+                card.removeAttribute('aria-hidden');
+            }
+
+            if (isActive) {
+                card.setAttribute('aria-current', 'true');
+            } else {
+                card.removeAttribute('aria-current');
+            }
         });
-        button.classList.add('is-active');
-        button.setAttribute('aria-pressed', 'true');
-        projectCards.forEach((card) => {
-            const visible = filter === 'all' || card.dataset.category === filter;
-            card.toggleAttribute('hidden', !visible);
+
+        const activeCard = projectCards[activeProjectIndex];
+
+        if (projectCategory) {
+            projectCategory.textContent = activeCard.dataset.category ?? '';
+        }
+
+        if (projectTitle) {
+            projectTitle.textContent = activeCard.dataset.title ?? '';
+        }
+
+        if (projectDescription) {
+            projectDescription.textContent = activeCard.dataset.description ?? '';
+        }
+
+        if (projectStack) {
+            projectStack.textContent = activeCard.dataset.stack ?? '';
+        }
+
+        if (projectCounter) {
+            projectCounter.textContent = `${padProjectNumber(activeProjectIndex + 1)} / ${padProjectNumber(totalProjects)}`;
+        }
+
+        if (announce && projectStatus) {
+            projectStatus.textContent = `Menampilkan proyek ${activeCard.dataset.title}`;
+        }
+    };
+
+    const focusProject = (index) => {
+        renderProject(index);
+        projectCards[activeProjectIndex]?.focus();
+    };
+
+    projectCards.forEach((card, index) => {
+        card.addEventListener('click', () => renderProject(index));
+
+        card.addEventListener('focus', () => {
+            if (index !== activeProjectIndex) {
+                renderProject(index);
+            }
+        });
+
+        card.addEventListener('keydown', (event) => {
+            const keyTargets = {
+                ArrowRight: activeProjectIndex + 1,
+                ArrowLeft: activeProjectIndex - 1,
+                Home: 0,
+                End: totalProjects - 1,
+            };
+            const targetIndex = keyTargets[event.key];
+
+            if (targetIndex === undefined) {
+                return;
+            }
+
+            event.preventDefault();
+            focusProject(targetIndex);
         });
     });
-});
+
+    previousProjectButton?.addEventListener('click', () => renderProject(activeProjectIndex - 1));
+    nextProjectButton?.addEventListener('click', () => renderProject(activeProjectIndex + 1));
+
+    renderProject(activeProjectIndex, false);
+}
 
 const revealElements = [...document.querySelectorAll('[data-reveal]')];
 
