@@ -18,6 +18,10 @@
             $projectCount = count($projects);
         @endphp
 
+        {{-- Kartu disusun melingkar: kartu yang posisinya melewati separuh daftar
+             dipindah ke sisi seberang agar tumpukan kiri dan kanan seimbang.
+             Perhitungan awal dilakukan di server supaya susunan sudah benar
+             sebelum JavaScript berjalan; aturan yang sama dipakai app.js. --}}
         <div class="project-showcase" data-project-showcase role="region" aria-roledescription="carousel" aria-label="Galeri proyek">
             <div class="project-deck-stage" data-reveal>
                 <div class="project-deck">
@@ -60,7 +64,7 @@
                 <button type="button" class="project-deck-arrow" data-project-previous aria-label="Proyek sebelumnya">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M14.5 5 7.5 12l7 7"/></svg>
                 </button>
-                <span class="project-deck-counter" data-project-counter>01 / {{ str_pad((string) $projectCount, 2, '0', STR_PAD_LEFT) }}</span>
+                <span class="project-deck-counter" data-project-counter>01 / {{ sprintf('%02d', $projectCount) }}</span>
                 <button type="button" class="project-deck-arrow" data-project-next aria-label="Proyek berikutnya">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m9.5 5 7 7-7 7"/></svg>
                 </button>

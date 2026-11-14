@@ -30,6 +30,9 @@
 
                     <article class="about-interests">
                         <h3>Keterampilan &amp; Minat</h3>
+                        {{-- Tab dan panel dipasangkan lewat slug. JavaScript memakai
+                             data-skill-tab, data-skill-panel, dan role tab untuk
+                             rotasi otomatis serta navigasi keyboard. --}}
                         <ul class="about-interest-list" role="tablist" aria-label="Pilih bidang informatika yang diminati">
                             @foreach ($skillDomains as $skill)
                                 <li role="presentation">
@@ -60,7 +63,7 @@
 
             <div class="about-skill-card" data-reveal>
                 <div class="about-skill-card-meta">
-                    <span data-skill-count>01 / 06</span>
+                    <span data-skill-count>{{ sprintf('%02d / %02d', 1, count($skillDomains)) }}</span>
                     <div class="about-skill-card-actions">
                         <span data-skill-status role="status">Rotasi otomatis · 5 detik</span>
                         <div class="about-skill-navigation" role="group" aria-label="Navigasi deskripsi minat">

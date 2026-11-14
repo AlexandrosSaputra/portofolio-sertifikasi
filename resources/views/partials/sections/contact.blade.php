@@ -1,4 +1,6 @@
 <section id="contact" class="content-section contact-section">
+    {{-- Animasi pesawat kertas murni dekoratif dan tidak menyampaikan informasi.
+         Elemen ini disembunyikan di layar kecil serta saat reduced motion aktif. --}}
     <div class="contact-flight" aria-hidden="true">
         <svg class="contact-flight-art" viewBox="0 0 1440 300" fill="none">
             <path id="contact-flight-route" class="contact-flight-route" d="M -30 292 C 120 320 260 236 400 240 C 520 244 600 178 720 188 C 840 198 900 128 1030 138 C 1150 148 1200 84 1320 92 C 1390 96 1420 62 1470 48"/>

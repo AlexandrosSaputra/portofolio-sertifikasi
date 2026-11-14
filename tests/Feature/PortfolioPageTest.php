@@ -23,6 +23,10 @@ class PortfolioPageTest extends TestCase
     {
         $response = $this->get('/');
 
+        $response->assertOk()
+            ->assertSee('data-menu-button', false)
+            ->assertSee('aria-controls="mobile-menu"', false);
+
         foreach (['Beranda', 'Tentang', 'Keahlian', 'Proyek', 'Kontak'] as $label) {
             $response->assertSee($label);
         }

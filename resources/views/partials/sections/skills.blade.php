@@ -13,14 +13,15 @@
 
         <div class="skills-index" data-reveal>
             <span>CAPABILITIES.LOG</span>
-            <span class="console-meta">{{ str_pad((string) count($skillDomains), 2, '0', STR_PAD_LEFT) }} BIDANG</span>
+            <span class="console-meta">{{ sprintf('%02d', count($skillDomainsByPriority)) }} BIDANG</span>
         </div>
 
         <div class="skill-grid" data-reveal>
-            @foreach (collect($skillDomains)->sortBy('priority') as $skill)
+            {{-- Kartu diurutkan berdasarkan prioritas, bukan urutan section Tentang. --}}
+            @foreach ($skillDomainsByPriority as $skill)
                 <article class="skill-tile" data-skill-domain="{{ $skill['slug'] }}" data-tier="{{ $skill['tier'] }}">
                     <div class="skill-tile-head">
-                        <span class="skill-tile-index">{{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>
+                        <span class="skill-tile-index">{{ sprintf('%02d', $loop->iteration) }}</span>
                         <span class="skill-badge">{{ $skill['status'] }}</span>
                     </div>
 

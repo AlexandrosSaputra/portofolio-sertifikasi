@@ -1,12 +1,6 @@
-@php
-    $navigationLinks = [
-        'home' => 'Beranda',
-        'about' => 'Tentang',
-        'skills' => 'Keahlian',
-        'projects' => 'Proyek',
-        'contact' => 'Kontak',
-    ];
-@endphp
+{{-- Label navigasi berasal dari config/portfolio.php. Markup yang sama dipakai
+     desktop dan mobile agar urutan tautan selalu konsisten; JavaScript memakai
+     atribut data-nav-link untuk status aktif dan menutup menu mobile. --}}
 
 <header class="site-header">
     <nav class="site-shell nav-shell" aria-label="Navigasi utama">
@@ -22,9 +16,6 @@
         </div>
 
         <div class="nav-actions">
-            <span class="nav-signal" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3.5"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/></svg>
-            </span>
             <a href="#contact" class="nav-cta">Hire Me</a>
             <button data-menu-button type="button" class="menu-button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Buka menu">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>

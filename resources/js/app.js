@@ -1,60 +1,97 @@
-const menuButton = document.querySelector('[data-menu-button]');
-const mobileMenu = document.querySelector('[data-mobile-menu]');
+/**
+ * Interaksi halaman portofolio. Setiap fungsi keluar lebih awal jika elemen
+ * penandanya tidak ada, sehingga partial section bisa dilepas tanpa error.
+ */
 
-menuButton?.addEventListener('click', () => {
-    const isOpen = menuButton.getAttribute('aria-expanded') === 'true';
-    menuButton.setAttribute('aria-expanded', String(!isOpen));
-    menuButton.setAttribute('aria-label', isOpen ? 'Buka menu' : 'Tutup menu');
-    mobileMenu?.classList.toggle('hidden');
-});
+const allowsMotion = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-document.querySelectorAll('[data-nav-link]').forEach((link) => {
-    link.addEventListener('click', () => {
-        menuButton?.setAttribute('aria-expanded', 'false');
-        mobileMenu?.classList.add('hidden');
+/**
+ * Menu mobile: tombol mengatur aria-expanded dan tautan navigasi menutup menu
+ * setelah diklik agar section tujuan langsung terlihat.
+ */
+function initMobileMenu() {
+    const menuButton = document.querySelector('[data-menu-button]');
+    const mobileMenu = document.querySelector('[data-mobile-menu]');
+
+    if (!menuButton || !mobileMenu) {
+        return;
+    }
+
+    const setMenuOpen = (isOpen) => {
+        menuButton.setAttribute('aria-expanded', String(isOpen));
+        menuButton.setAttribute('aria-label', isOpen ? 'Tutup menu' : 'Buka menu');
+        mobileMenu.classList.toggle('hidden', !isOpen);
+    };
+
+    menuButton.addEventListener('click', () => {
+        setMenuOpen(menuButton.getAttribute('aria-expanded') !== 'true');
     });
-});
 
-const projectShowcase = document.querySelector('[data-project-showcase]');
+    document.querySelectorAll('[data-nav-link]').forEach((link) => {
+        link.addEventListener('click', () => setMenuOpen(false));
+    });
+}
 
-if (projectShowcase) {
-    const projectCards = [...projectShowcase.querySelectorAll('[data-project-card]')];
-    const projectCategory = projectShowcase.querySelector('[data-project-category]');
-    const projectTitle = projectShowcase.querySelector('[data-project-title]');
-    const projectDescription = projectShowcase.querySelector('[data-project-description]');
-    const projectStack = projectShowcase.querySelector('[data-project-stack]');
-    const projectCounter = projectShowcase.querySelector('[data-project-counter]');
-    const projectStatus = projectShowcase.querySelector('[data-project-status]');
-    const previousProjectButton = projectShowcase.querySelector('[data-project-previous]');
-    const nextProjectButton = projectShowcase.querySelector('[data-project-next]');
-    const totalProjects = projectCards.length;
-    let activeProjectIndex = 0;
+/**
+ * Galeri proyek berbentuk tumpukan kartu melingkar. Hanya tiga kartu terdekat
+ * yang terlihat; kartu jauh dibuat inert dan aria-hidden agar tidak bisa
+ * difokuskan atau dibacakan pembaca layar.
+ */
+function initProjectShowcase() {
+    const showcase = document.querySelector('[data-project-showcase]');
 
-    const padProjectNumber = (value) => String(value).padStart(2, '0');
+    if (!showcase) {
+        return;
+    }
 
-    const getProjectPosition = (cardIndex) => {
-        let position = cardIndex - activeProjectIndex;
+    const cards = [...showcase.querySelectorAll('[data-project-card]')];
+    const category = showcase.querySelector('[data-project-category]');
+    const title = showcase.querySelector('[data-project-title]');
+    const description = showcase.querySelector('[data-project-description]');
+    const stack = showcase.querySelector('[data-project-stack]');
+    const counter = showcase.querySelector('[data-project-counter]');
+    const status = showcase.querySelector('[data-project-status]');
+    const previousButton = showcase.querySelector('[data-project-previous]');
+    const nextButton = showcase.querySelector('[data-project-next]');
+    const total = cards.length;
+    let activeIndex = 0;
 
-        if (position > totalProjects / 2) {
-            position -= totalProjects;
+    if (total === 0) {
+        return;
+    }
+
+    const pad = (value) => String(value).padStart(2, '0');
+
+    /**
+     * Posisi kartu relatif terhadap kartu aktif (-2 sampai 2). Kartu yang
+     * melewati separuh daftar diputar ke sisi seberang supaya tumpukan kiri
+     * dan kanan tetap seimbang.
+     */
+    const getCardPosition = (cardIndex) => {
+        let position = cardIndex - activeIndex;
+
+        if (position > total / 2) {
+            position -= total;
         }
 
-        if (position < -totalProjects / 2) {
-            position += totalProjects;
+        if (position < -total / 2) {
+            position += total;
         }
 
         return position;
     };
 
-    const renderProject = (index, announce = true) => {
-        if (totalProjects === 0) {
-            return;
-        }
+    /**
+     * @param {number} index
+     * @param {boolean} announce Menulis status ke live region; dimatikan saat
+     *                           render awal agar pembaca layar tidak langsung
+     *                           membacakan proyek pertama.
+     */
+    const render = (index, announce = true) => {
+        activeIndex = (index + total) % total;
 
-        activeProjectIndex = (index + totalProjects) % totalProjects;
-
-        projectCards.forEach((card, cardIndex) => {
-            const position = getProjectPosition(cardIndex);
+        cards.forEach((card, cardIndex) => {
+            const position = getCardPosition(cardIndex);
             const isOffstage = Math.abs(position) > 2;
             const isActive = position === 0;
 
@@ -76,267 +113,328 @@ if (projectShowcase) {
             }
         });
 
-        const activeCard = projectCards[activeProjectIndex];
+        const activeCard = cards[activeIndex];
 
-        if (projectCategory) {
-            projectCategory.textContent = activeCard.dataset.category ?? '';
+        if (category) {
+            category.textContent = activeCard.dataset.category ?? '';
         }
 
-        if (projectTitle) {
-            projectTitle.textContent = activeCard.dataset.title ?? '';
+        if (title) {
+            title.textContent = activeCard.dataset.title ?? '';
         }
 
-        if (projectDescription) {
-            projectDescription.textContent = activeCard.dataset.description ?? '';
+        if (description) {
+            description.textContent = activeCard.dataset.description ?? '';
         }
 
-        if (projectStack) {
-            projectStack.textContent = activeCard.dataset.stack ?? '';
+        if (stack) {
+            stack.textContent = activeCard.dataset.stack ?? '';
         }
 
-        if (projectCounter) {
-            projectCounter.textContent = `${padProjectNumber(activeProjectIndex + 1)} / ${padProjectNumber(totalProjects)}`;
+        if (counter) {
+            counter.textContent = `${pad(activeIndex + 1)} / ${pad(total)}`;
         }
 
-        if (announce && projectStatus) {
-            projectStatus.textContent = `Menampilkan proyek ${activeCard.dataset.title}`;
+        if (announce && status) {
+            status.textContent = `Menampilkan proyek ${activeCard.dataset.title}`;
         }
     };
 
-    const focusProject = (index) => {
-        renderProject(index);
-        projectCards[activeProjectIndex]?.focus();
+    const focusCard = (index) => {
+        render(index);
+        cards[activeIndex]?.focus();
     };
 
-    projectCards.forEach((card, index) => {
-        card.addEventListener('click', () => renderProject(index));
+    cards.forEach((card, index) => {
+        card.addEventListener('click', () => render(index));
 
+        // Fokus keyboard ikut memindahkan kartu aktif agar detail tetap sinkron.
         card.addEventListener('focus', () => {
-            if (index !== activeProjectIndex) {
-                renderProject(index);
+            if (index !== activeIndex) {
+                render(index);
             }
         });
 
         card.addEventListener('keydown', (event) => {
-            const keyTargets = {
-                ArrowRight: activeProjectIndex + 1,
-                ArrowLeft: activeProjectIndex - 1,
+            const targetByKey = {
+                ArrowRight: activeIndex + 1,
+                ArrowLeft: activeIndex - 1,
                 Home: 0,
-                End: totalProjects - 1,
+                End: total - 1,
             };
-            const targetIndex = keyTargets[event.key];
+            const targetIndex = targetByKey[event.key];
 
             if (targetIndex === undefined) {
                 return;
             }
 
             event.preventDefault();
-            focusProject(targetIndex);
+            focusCard(targetIndex);
         });
     });
 
-    previousProjectButton?.addEventListener('click', () => renderProject(activeProjectIndex - 1));
-    nextProjectButton?.addEventListener('click', () => renderProject(activeProjectIndex + 1));
+    previousButton?.addEventListener('click', () => render(activeIndex - 1));
+    nextButton?.addEventListener('click', () => render(activeIndex + 1));
 
-    renderProject(activeProjectIndex, false);
+    render(activeIndex, false);
 }
 
-const revealElements = [...document.querySelectorAll('[data-reveal]')];
+/**
+ * Menampilkan elemen bertanda data-reveal saat masuk viewport. Elemen diberi
+ * delay kecil bergiliran supaya kemunculannya terasa berurutan, dan langsung
+ * ditampilkan jika IntersectionObserver tidak tersedia.
+ */
+function initRevealAnimations() {
+    const elements = [...document.querySelectorAll('[data-reveal]')];
 
-revealElements.forEach((element, index) => {
-    element.style.setProperty('--reveal-delay', `${(index % 4) * 90}ms`);
-});
+    if (elements.length === 0) {
+        return;
+    }
 
-if ('IntersectionObserver' in window) {
-    const revealObserver = new IntersectionObserver((entries) => {
+    elements.forEach((element, index) => {
+        element.style.setProperty('--reveal-delay', `${(index % 4) * 90}ms`);
+    });
+
+    if (!('IntersectionObserver' in window)) {
+        elements.forEach((element) => element.classList.add('is-visible'));
+        return;
+    }
+
+    const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('is-visible');
-                revealObserver.unobserve(entry.target);
+                observer.unobserve(entry.target);
             }
         });
     }, { threshold: 0.14 });
 
-    revealElements.forEach((element) => revealObserver.observe(element));
-} else {
-    revealElements.forEach((element) => element.classList.add('is-visible'));
+    elements.forEach((element) => observer.observe(element));
 }
 
-const profileFrame = document.querySelector('[data-profile-card]');
-const profileCard = document.querySelector('[data-profile-card-content]');
-const allowsMotion = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+/**
+ * Kemiringan kartu profil mengikuti posisi pointer. Efek ini dianggap
+ * dekoratif, jadi tidak dijalankan saat pengunjung meminta reduced motion.
+ */
+function initProfileTilt() {
+    const frame = document.querySelector('[data-profile-card]');
+    const card = document.querySelector('[data-profile-card-content]');
 
-if (profileFrame && profileCard && allowsMotion) {
-    profileFrame.addEventListener('pointermove', (event) => {
-        const bounds = profileFrame.getBoundingClientRect();
+    if (!frame || !card || !allowsMotion) {
+        return;
+    }
+
+    frame.addEventListener('pointermove', (event) => {
+        const bounds = frame.getBoundingClientRect();
         const pointerX = (event.clientX - bounds.left) / bounds.width;
         const pointerY = (event.clientY - bounds.top) / bounds.height;
 
-        profileCard.style.setProperty('--rotate-x', `${(0.5 - pointerY) * 8}deg`);
-        profileCard.style.setProperty('--rotate-y', `${(pointerX - 0.5) * 10}deg`);
-        profileCard.style.setProperty('--pointer-x', `${pointerX * 100}%`);
-        profileCard.style.setProperty('--pointer-y', `${pointerY * 100}%`);
+        card.style.setProperty('--rotate-x', `${(0.5 - pointerY) * 8}deg`);
+        card.style.setProperty('--rotate-y', `${(pointerX - 0.5) * 10}deg`);
+        card.style.setProperty('--pointer-x', `${pointerX * 100}%`);
+        card.style.setProperty('--pointer-y', `${pointerY * 100}%`);
     });
 
-    profileFrame.addEventListener('pointerleave', () => {
-        profileCard.style.setProperty('--rotate-x', '0deg');
-        profileCard.style.setProperty('--rotate-y', '0deg');
-        profileCard.style.setProperty('--pointer-x', '50%');
-        profileCard.style.setProperty('--pointer-y', '50%');
+    frame.addEventListener('pointerleave', () => {
+        card.style.setProperty('--rotate-x', '0deg');
+        card.style.setProperty('--rotate-y', '0deg');
+        card.style.setProperty('--pointer-x', '50%');
+        card.style.setProperty('--pointer-y', '50%');
     });
 }
 
-const skillShowcase = document.querySelector('[data-skill-showcase]');
-const skillTabs = [...document.querySelectorAll('[data-skill-tab]')];
-const skillPanels = [...document.querySelectorAll('[data-skill-panel]')];
-const skillCount = skillShowcase?.querySelector('[data-skill-count]');
-const skillStatus = skillShowcase?.querySelector('[data-skill-status]');
-const skillProgress = skillShowcase?.querySelector('[data-skill-progress]');
-const previousSkillButton = skillShowcase?.querySelector('[data-skill-previous]');
-const nextSkillButton = skillShowcase?.querySelector('[data-skill-next]');
-const skillRotationInterval = 5000;
+/**
+ * Rotasi bidang keahlian di section Tentang. Interaksi manual mengunci rotasi
+ * agar panel tidak berpindah saat sedang dibaca; klik ulang melepas kunci.
+ */
+function initSkillShowcase() {
+    const showcase = document.querySelector('[data-skill-showcase]');
 
-if (skillShowcase && skillTabs.length === skillPanels.length && skillTabs.length > 0) {
-    let activeSkillIndex = 0;
-    let isSkillPinned = false;
-    let skillRotationTimer = null;
+    if (!showcase) {
+        return;
+    }
 
-    const renderSkill = (index) => {
-        activeSkillIndex = index;
+    const tabs = [...showcase.querySelectorAll('[data-skill-tab]')];
+    const panels = [...showcase.querySelectorAll('[data-skill-panel]')];
+    const count = showcase.querySelector('[data-skill-count]');
+    const status = showcase.querySelector('[data-skill-status]');
+    const progress = showcase.querySelector('[data-skill-progress]');
+    const previousButton = showcase.querySelector('[data-skill-previous]');
+    const nextButton = showcase.querySelector('[data-skill-next]');
 
-        skillTabs.forEach((tab, tabIndex) => {
-            const isActive = tabIndex === activeSkillIndex;
+    // Harus sama dengan durasi animasi .about-skill-progress pada app.css.
+    const rotationInterval = 5000;
+
+    if (tabs.length === 0 || tabs.length !== panels.length) {
+        return;
+    }
+
+    let activeIndex = 0;
+    let isPinned = false;
+    let rotationTimer = null;
+
+    const render = (index) => {
+        activeIndex = index;
+
+        tabs.forEach((tab, tabIndex) => {
+            const isActive = tabIndex === activeIndex;
             tab.classList.toggle('is-active', isActive);
             tab.setAttribute('aria-selected', String(isActive));
             tab.setAttribute('tabindex', isActive ? '0' : '-1');
         });
 
-        skillPanels.forEach((panel, panelIndex) => {
-            panel.toggleAttribute('hidden', panelIndex !== activeSkillIndex);
+        panels.forEach((panel, panelIndex) => {
+            panel.toggleAttribute('hidden', panelIndex !== activeIndex);
         });
 
-        if (skillCount) {
-            const current = String(activeSkillIndex + 1).padStart(2, '0');
-            const total = String(skillTabs.length).padStart(2, '0');
-            skillCount.textContent = `${current} / ${total}`;
+        if (count) {
+            count.textContent = `${String(activeIndex + 1).padStart(2, '0')} / ${String(tabs.length).padStart(2, '0')}`;
         }
     };
 
-    const stopSkillRotation = () => {
-        window.clearTimeout(skillRotationTimer);
-        skillRotationTimer = null;
-        skillProgress?.classList.remove('is-running');
+    const stopRotation = () => {
+        window.clearTimeout(rotationTimer);
+        rotationTimer = null;
+        progress?.classList.remove('is-running');
     };
 
-    const updateSkillStatus = () => {
-        skillShowcase.toggleAttribute('data-pinned', isSkillPinned);
+    const updateStatus = () => {
+        showcase.toggleAttribute('data-pinned', isPinned);
 
-        if (!skillStatus) {
+        if (!status) {
             return;
         }
 
         if (!allowsMotion) {
-            skillStatus.textContent = 'Rotasi otomatis dinonaktifkan';
+            status.textContent = 'Rotasi otomatis dinonaktifkan';
             return;
         }
 
-        skillStatus.textContent = isSkillPinned
+        status.textContent = isPinned
             ? 'Terkunci · klik ulang untuk melepas'
             : 'Rotasi otomatis · 5 detik';
     };
 
-    const restartSkillProgress = () => {
-        if (!skillProgress || !allowsMotion || isSkillPinned) {
+    const restartProgress = () => {
+        if (!progress || !allowsMotion || isPinned) {
             return;
         }
 
-        skillProgress.classList.remove('is-running');
-        void skillProgress.offsetWidth;
-        skillProgress.classList.add('is-running');
+        // Memaksa reflow agar animasi progress dimulai lagi dari nol.
+        progress.classList.remove('is-running');
+        void progress.offsetWidth;
+        progress.classList.add('is-running');
     };
 
-    const scheduleSkillRotation = () => {
-        stopSkillRotation();
+    const scheduleRotation = () => {
+        stopRotation();
 
-        if (!allowsMotion || isSkillPinned || document.hidden) {
+        if (!allowsMotion || isPinned || document.hidden) {
             return;
         }
 
-        restartSkillProgress();
-        skillRotationTimer = window.setTimeout(() => {
-            renderSkill((activeSkillIndex + 1) % skillTabs.length);
-            scheduleSkillRotation();
-        }, skillRotationInterval);
+        restartProgress();
+        rotationTimer = window.setTimeout(() => {
+            render((activeIndex + 1) % tabs.length);
+            scheduleRotation();
+        }, rotationInterval);
     };
 
-    const pinSkill = (index) => {
-        renderSkill(index);
-        isSkillPinned = true;
-        updateSkillStatus();
-        stopSkillRotation();
+    const pin = (index) => {
+        render(index);
+        isPinned = true;
+        updateStatus();
+        stopRotation();
     };
 
-    skillTabs.forEach((tab, index) => {
+    tabs.forEach((tab, index) => {
         tab.addEventListener('click', () => {
-            if (index === activeSkillIndex && isSkillPinned) {
-                isSkillPinned = false;
-                updateSkillStatus();
-                scheduleSkillRotation();
+            if (index === activeIndex && isPinned) {
+                isPinned = false;
+                updateStatus();
+                scheduleRotation();
                 return;
             }
 
-            pinSkill(index);
+            pin(index);
         });
 
         tab.addEventListener('keydown', (event) => {
-            const keyTargets = {
-                ArrowRight: (index + 1) % skillTabs.length,
-                ArrowDown: (index + 1) % skillTabs.length,
-                ArrowLeft: (index - 1 + skillTabs.length) % skillTabs.length,
-                ArrowUp: (index - 1 + skillTabs.length) % skillTabs.length,
+            const targetByKey = {
+                ArrowRight: (index + 1) % tabs.length,
+                ArrowDown: (index + 1) % tabs.length,
+                ArrowLeft: (index - 1 + tabs.length) % tabs.length,
+                ArrowUp: (index - 1 + tabs.length) % tabs.length,
                 Home: 0,
-                End: skillTabs.length - 1,
+                End: tabs.length - 1,
             };
-            const targetIndex = keyTargets[event.key];
+            const targetIndex = targetByKey[event.key];
 
             if (targetIndex === undefined) {
                 return;
             }
 
             event.preventDefault();
-            skillTabs[targetIndex].focus();
-            pinSkill(targetIndex);
+            tabs[targetIndex].focus();
+            pin(targetIndex);
         });
     });
 
-    previousSkillButton?.addEventListener('click', () => {
-        pinSkill((activeSkillIndex - 1 + skillTabs.length) % skillTabs.length);
+    previousButton?.addEventListener('click', () => {
+        pin((activeIndex - 1 + tabs.length) % tabs.length);
     });
 
-    nextSkillButton?.addEventListener('click', () => {
-        pinSkill((activeSkillIndex + 1) % skillTabs.length);
+    nextButton?.addEventListener('click', () => {
+        pin((activeIndex + 1) % tabs.length);
     });
 
+    // Timer dihentikan saat tab tidak terlihat agar tidak berjalan di latar.
     document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
-            stopSkillRotation();
+            stopRotation();
             return;
         }
 
-        scheduleSkillRotation();
+        scheduleRotation();
     });
 
-    renderSkill(activeSkillIndex);
-    updateSkillStatus();
-    scheduleSkillRotation();
+    render(activeIndex);
+    updateStatus();
+    scheduleRotation();
 }
 
-const sections = [...document.querySelectorAll('main section[id]')];
-const navLinks = [...document.querySelectorAll('[data-nav-link]')];
-const sectionObserver = new IntersectionObserver((entries) => {
-    const visibleSection = entries.filter((entry) => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-    if (!visibleSection) return;
-    navLinks.forEach((link) => link.classList.toggle('is-current', link.getAttribute('href') === `#${visibleSection.target.id}`));
-}, { rootMargin: '-35% 0px -55%', threshold: [0, 0.25, 0.5] });
+/**
+ * Menandai tautan navigasi yang cocok dengan section paling dominan di
+ * viewport. rootMargin mempersempit pengamatan ke area tengah layar.
+ */
+function initActiveSectionHighlight() {
+    const sections = [...document.querySelectorAll('main section[id]')];
+    const navLinks = [...document.querySelectorAll('[data-nav-link]')];
 
-sections.forEach((section) => sectionObserver.observe(section));
+    if (sections.length === 0 || navLinks.length === 0 || !('IntersectionObserver' in window)) {
+        return;
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+        const visibleSection = entries
+            .filter((entry) => entry.isIntersecting)
+            .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+        if (!visibleSection) {
+            return;
+        }
+
+        navLinks.forEach((link) => {
+            link.classList.toggle('is-current', link.getAttribute('href') === `#${visibleSection.target.id}`);
+        });
+    }, { rootMargin: '-35% 0px -55%', threshold: [0, 0.25, 0.5] });
+
+    sections.forEach((section) => observer.observe(section));
+}
+
+initMobileMenu();
+initProjectShowcase();
+initRevealAnimations();
+initProfileTilt();
+initSkillShowcase();
+initActiveSectionHighlight();

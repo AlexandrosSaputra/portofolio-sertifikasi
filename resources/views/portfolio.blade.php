@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&amp;family=Raleway:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+    {{-- Kelas ditambahkan sebelum CSS dimuat agar elemen ber-animasi reveal tidak
+         berkedip; tanpa JavaScript, elemen tetap tampil karena selektornya html.js. --}}
     <script>document.documentElement.classList.add('js');</script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -17,6 +19,7 @@
 
     @include('partials.navigation')
 
+    {{-- Urutan section mengikuti alur navigasi dari Beranda sampai Kontak. --}}
     <main>
         @include('partials.sections.home')
         @include('partials.sections.about')
